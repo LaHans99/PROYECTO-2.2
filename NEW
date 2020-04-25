@@ -1,0 +1,209 @@
+#include <iostream>
+using namespace std;
+#include <fstream>
+#include "Actor.h"
+#include <string>
+#include "Pelicula.h"
+#include "Hora.h"
+#include "Funcion.h"
+
+int main()
+ {
+  ifstream archivoEntradaActores;
+  archivoEntradaActores.open("listaActores.txt");
+
+  Actor actores[20]; 
+  int cont = 0, pos;
+  string todaLinea;
+  
+ 
+ // donde va a leer(donde va a escribir) leer lista de actores
+ while(getline(archivoEntradaActores, todaLinea))
+  {
+    pos= todaLinea.find(" ");
+     actores[cont].setid(stoi(todaLinea.substr(0,pos)));
+     actores[cont].setnombre(todaLinea.substr(pos + 1));
+    cont++;
+  } 
+
+
+  ifstream archivoEntradaPeliculas;
+  archivoEntradaPeliculas.open("listaPeliculas.txt");
+
+// leer lista de peliculas
+Pelicula lista[20];
+int cont2=0; 
+ int numdeActores[20];
+ int actorID, aux;
+while(getline(archivoEntradaPeliculas, todaLinea))
+{
+    pos= todaLinea.find(" ");
+    lista[cont2].setnumPeli(stoi(todaLinea.substr(0,pos)));
+    todaLinea.erase(0,pos + 1);
+
+    pos= todaLinea.find(" ");
+    lista[cont2].setanio(stoi(todaLinea.substr(0,pos)));
+    todaLinea.erase(0,pos + 1);
+
+    pos= todaLinea.find(" ");
+    lista[cont2].setduracion(stoi(todaLinea.substr(0,pos)));
+     todaLinea.erase(0,pos + 1);
+
+    pos= todaLinea.find(" ");
+    lista[cont2].setgenero(todaLinea.substr(0,pos));
+    todaLinea.erase(0,pos + 1);
+
+    pos = todaLinea.find(" ");
+    numdeActores[cont2] = stoi(todaLinea.substr(0,pos));// 
+    todaLinea.erase(0,pos + 1);
+
+    for ( int i = 0; i < numdeActores[cont]; i++ )
+    {
+        pos = todaLinea.find(" ");
+        actorID = stoi(todaLinea.substr(0,pos));
+
+        for ( int r = 0; r <20 ; r ++)
+      {
+         if (actorID == actores[r].getid())
+         { 
+            aux = r;
+         }
+      }
+        lista[cont2].setActor(actores[aux - 1]);
+        todaLinea.erase(0,pos + 1);
+    }
+    lista[cont2].settitulo(todaLinea);
+    cont2++;
+}
+int funcionesHoy;
+string  cvFuncion;
+int numeroPelicula;
+int numeroSala;
+Hora hora;
+int horas;
+int minuto;
+Funcion listafuncion[20];
+
+//escribir datos de funciones
+cout << " Bienvenidos a STOI PELICULAS, cuantas funciones hay hoy "<< endl;
+cin >> funcionesHoy;
+
+for ( int i = 0; i < funcionesHoy; i++ )
+{
+    cout << "Marca la Clave de la Funcion" << endl;;
+    cin >> cvFuncion;
+    listafuncion[i].setcveFuncion(cvFuncion);
+
+    cout << " Ingresa el numero de la Pelicula" <<endl;
+    cin >> numeroPelicula;
+    listafuncion[i].setnumPeli(numeroPelicula);
+
+    cout << "Ingresa el numero de la Sala "<< endl;
+    cin >> numeroSala;
+    listafuncion[i].setsala(numeroSala);
+    
+  cout << "Cual es la hora y minuto 00:00" <<endl;
+        cin >> horas >> minuto;   
+
+    while (!(horas > 0 && horas <= 23) && (minuto > 0 && minuto <= 59))
+    {
+        cout << "vuelva a poner la hora y minuto 00:00" <<endl;
+        cin >> horas >> minuto;   
+    }
+    hora.sethh(horas);
+    hora.setmm(minuto);
+    listafuncion[i].sethora(hora);
+
+}
+
+//menu y leer 
+char opcion;
+while( opcion != 'g')
+{
+    cout << " a. muestra actores "<<endl;
+   
+    cout << "b. consultar pelicula "<< endl;
+    
+    cout << "c.consultar funciones disponibles" <<endl;
+ 
+    cout << "D.consultar funciones por hora" <<endl;
+
+    cout << "E. consultar por clave de funcion "<<endl;
+    cout << "F. consultar peliculas que participe un actor" <<endl;
+
+    cout << "G. terminar" <<endl;
+
+    cin >> opcion;
+
+    switch (opcion) 
+    {
+        case 'a' : 
+    
+        for( int i = 0; i < cont; i++ )
+      {
+        actores[i].muestra();
+      }
+      break;
+
+        case 'b':
+
+        for ( int i= 0 ; i <cont2 ; i++)
+        {
+            lista[i].muestra();
+        }
+        break;
+
+        case 'c':
+        for ( int i = 0 ; i < funcionesHoy; i++)
+        {
+            listafuncion[i].muestra(lista);
+        }
+        break;
+        case 'd':
+         cout << "ingresar una hora que desea checar"<<endl;
+         cin >> horas; 
+         for ( int i = 0; i < 20; i ++)
+         {
+             if( horas == listafuncion[i].gethora().gethh())
+             {
+                 listafuncion[i].muestra(lista);
+             }
+         }
+        break;
+        case 'e':
+        cout << "ingresar la clave de la funcion "<<endl;
+        cin >> cvFuncion;
+        for ( int i = 0; i< 20; i ++)
+        {
+             if ( cvFuncion == listafuncion[i].getcveFuncion())
+             {
+                 listafuncion[i].muestra(lista);
+             }
+        }
+        break;
+        case 'f':
+        cout << "dame el id de tu actor favorito" <<endl;
+        cin >> actorID;
+        
+        for (int i = 0 ; i <20; i++ )
+        {
+            if (actorID == actores[i].getid())
+            {
+                for( int z= 0 ; z <10; z++)
+                {
+                    if( actores[i].getid() == lista[i].getActor(z).getid())
+                    {
+                        cout << "titulo : " << lista[i].gettitulo() <<endl;
+                        cout << "anio: " << lista[i].getanio() <<endl;
+                    }
+                }
+            }
+        }
+        break;
+        case 'g' :
+        cout << " bye  ";
+        return 0;
+        break;
+    }
+}
+}
